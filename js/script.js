@@ -12,6 +12,8 @@ For assistance:
 */
 
 const itemsPerPage = 9;
+const studentList = document.querySelector('.student-list');
+const pagesList = document.querySelector('.link-list');
 
 /*
 Create the `showPage` function
@@ -20,7 +22,6 @@ This function will create and insert/append the elements needed to display a "pa
 const showPage = (list, page) => {
    const startIndex = (page * itemsPerPage) - itemsPerPage;
    const endIndex = (page * itemsPerPage);
-   const studentList = document.querySelector('.student-list');
    studentList.innerHTML = "";
    // loop over all student objects
    list.forEach((student, index) => {
@@ -50,7 +51,6 @@ This function will create and insert/append the elements needed for the paginati
 const addPagination = list => {
    // find out how many pages are needed for all the student cards
    const pages = Math.ceil(list.length / itemsPerPage);
-   const pagesList = document.querySelector('.link-list');
    pagesList.innerHTML = "" ;
    for ( let i = 1 ; i <= pages ; i++) {
       pagesList.insertAdjacentHTML('beforeend', ` 
@@ -77,3 +77,32 @@ const addPagination = list => {
 // Call functions
 showPage(data, 1);
 addPagination(data);
+
+
+/* Search feature */
+
+// add the input field to the page
+document.querySelector('.header').insertAdjacentHTML('beforeend', `
+   <label for="search" class="student-search">
+      <input id="search" placeholder="Search by name...">
+      <button type="button"><img src="img/icn-search.svg" alt="Search icon"></button>
+   </label>
+`);
+
+const searchFunction = (list, input) => {
+   // loop over the list to check if the first or last name includes the input value
+   const students = list.filter(student => student.name.first.toLowerCase().includes(input) || student.name.last.toLowerCase().includes(input));
+   if(students.length !== 0){
+      // load the student cards and pagination when there's at least one object left
+      showPage(students, 1);
+      addPagination(students);
+   } else {
+      // when there are no results for the search display to the page and hide the pagination
+      studentList.innerHTML = 'No students found';
+      pagesList.innerHTML = '';
+   }
+   
+};
+
+const search = document.querySelector('#search');
+search.addEventListener('keyup', e => searchFunction(data, e.target.value));
